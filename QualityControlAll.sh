@@ -174,7 +174,13 @@ main()
             if [ $tmp != 72 ] && [ $tmp != 300 ]; then echo "BOLD dimensions are not correct." >> ${OutDIR}/qc_issues.txt; fi
         fi
 	if [ "${seq}" == "QSM" ]; then
-            dcm2niix -f QSM -o ${OutDIR}/ ${SubjectDIR}/*/2?.AdjGre
+
+	    echo `ls -d ${SubjectDIR}/*/*AdjGre` >> rtmp
+	    read -d '' -r -a rtemp < rtmp
+            dcm2niix -f QSM -o ${OutDIR}/ ${SubjectDIR}/*/`echo ${rtemp[0]} | rev | cut -d "/" -f1 | rev`
+            dcm2niix -f QSM -o ${OutDIR}/ ${SubjectDIR}/*/`echo ${rtemp[1]} | rev | cut -d "/" -f1 | rev`
+	    rm rtemp
+
             echo "`fslinfo ${OutDIR}/QSM_e1.nii`" > ${OutDIR}/temp.txt
             tmp=$(cat ${OutDIR}/temp.txt | grep -m 1 'dim3' | sed 's/dim3//')
             if [ $tmp != 64 ]; then echo "QSM dimensions are not correct." >> ${OutDIR}/qc_issues.txt; fi
